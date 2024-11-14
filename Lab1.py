@@ -2,20 +2,16 @@ from math import cos, sin
 
 # import matplotlib.pyplot as mplt
 
+pointsX = input("Enter the x values  separated by space: ")
+pointsXList = [float(value) for value in pointsX.split()]
+interPoint = float(input("Enter interpolation point: "))
+
+a = 1
+b = 2
+
 
 def f(x):  # моя функція зі завдання (2га)
     return sin(cos(x))
-
-
-pointsX = input("Enter the x values  separated by space: ")
-pointsY = input("Enter the y values respectively  separated by space: ")
-interPoint = float(input("Enter interpolation point: "))
-
-pointsXList = [float(value) for value in pointsX.split()]
-pointsYList = [float(value) for value in pointsY.split()]
-points = list(zip(pointsXList, pointsYList))
-
-n = len(pointsXList)
 
 
 def InterpolatePolynomLagrange(xList, yList, n):
@@ -28,13 +24,6 @@ def InterpolatePolynomLagrange(xList, yList, n):
 
     polynomial = " + ".join(term_string(i, xList, yList) for i in range(n))
     return polynomial
-
-
-interpolatedPolynom = InterpolatePolynomLagrange(pointsXList, pointsYList, n)
-
-a = 1
-b = 2
-h = (b - a) / n
 
 
 def ChooseX(a, b, h):
@@ -50,3 +39,16 @@ def ChooseX(a, b, h):
 def FindY(chosenX):
     chosenY = [f(x) for x in chosenX]
     return chosenY
+
+
+n = len(pointsXList)
+h = (b - a) / n
+
+chosenX = ChooseX(a, b, h)
+chosenY = FindY(chosenX)
+
+#points = list(zip(pointsXList, pointsYList))
+
+
+interpolatedPolynom = InterpolatePolynomLagrange(chosenX, chosenY, n)
+#print(interpolatedPolynom)
