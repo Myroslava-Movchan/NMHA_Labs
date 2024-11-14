@@ -15,14 +15,14 @@ def f(x):  # моя функція зі завдання (2га)
 
 
 def InterpolatePolynomLagrange(xList, yList, n):
-    def term_string(i, xList, yList):
+    def termString(i, xList, yList):
         term = f"{yList[i]}"
         for j in range(n):
             if j != i:
                 term += f" * (x - {xList[j]}) / ({xList[i]} - {xList[j]})"
         return term
 
-    polynomial = " + ".join(term_string(i, xList, yList) for i in range(n))
+    polynomial = " + ".join(termString(i, xList, yList) for i in range(n))
     return polynomial
 
 
