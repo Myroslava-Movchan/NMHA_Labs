@@ -1,8 +1,11 @@
 from math import cos, sin
-#import matplotlib.pyplot as mplt
 
-def f(x): #моя функція зі завдання (2га)
+# import matplotlib.pyplot as mplt
+
+
+def f(x):  # моя функція зі завдання (2га)
     return sin(cos(x))
+
 
 pointsX = input("Enter the x values  separated by space: ")
 pointsY = input("Enter the y values respectively  separated by space: ")
@@ -26,8 +29,24 @@ def InterpolatePolynomLagrange(xList, yList, n):
     polynomial = " + ".join(term_string(i, xList, yList) for i in range(n))
     return polynomial
 
+
 interpolatedPolynom = InterpolatePolynomLagrange(pointsXList, pointsYList, n)
 
 a = 1
 b = 2
+h = (b - a) / n
 
+
+def ChooseX(a, b, h):
+    last = a
+    chosenX = []
+    while last < b:
+        chosenX.append(last)
+        last += h
+    chosenX.append(b)
+    return chosenX
+
+
+def FindY(chosenX):
+    chosenY = [f(x) for x in chosenX]
+    return chosenY
