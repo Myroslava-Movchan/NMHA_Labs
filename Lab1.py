@@ -1,10 +1,10 @@
 from math import cos, sin
 
-# import matplotlib.pyplot as mplt
+import matplotlib.pyplot as plt
 
-pointsX = input("Enter the x values  separated by space: ")
-pointsXList = [float(value) for value in pointsX.split()]
-interPoint = float(input("Enter interpolation point: "))
+points_x = input("Enter the x values  separated by space: ")
+points_x_list = [float(value) for value in points_x.split()]
+#inter_point = float(input("Enter interpolation point: "))
 
 a = 1
 b = 2
@@ -14,41 +14,64 @@ def f(x):  # моя функція зі завдання (2га)
     return sin(cos(x))
 
 
-def InterpolatePolynomLagrange(xList, yList, n):
-    def termString(i, xList, yList):
-        term = f"{yList[i]}"
-        for j in range(n):
-            if j != i:
-                term += f" * (x - {xList[j]}) / ({xList[i]} - {xList[j]})"
-        return term
+def InterpolatePolynomialLagrange(x_list, y_list, n):
+    def L(x):
+        res = 0
+        for i in range(n):
+            yN = y_list[i]
+            term = 1
+            for j in range(n):
+                if j != i:
+                    term *= (x - x_list[j]) / (x_list[i] - x_list[j])
+            res += yN * term
+        return res
 
-    polynomial = " + ".join(termString(i, xList, yList) for i in range(n))
-    return polynomial
+    return L
 
 
 def ChooseX(a, b, h):
     last = a
-    chosenX = []
+    chosen_x = []
     while last < b:
-        chosenX.append(last)
+        chosen_x.append(last)
         last += h
-    chosenX.append(b)
-    return chosenX
+    chosen_x.append(b)
+    return chosen_x
 
 
-def FindY(chosenX):
-    chosenY = [f(x) for x in chosenX]
-    return chosenY
+def FindY(chosen_x):
+    chosen_y = [f(x) for x in chosen_x]
+    return chosen_y
 
 
-n = len(pointsXList)
+n = len(points_x_list)
 h = (b - a) / n
 
-chosenX = ChooseX(a, b, h)
-chosenY = FindY(chosenX)
+chosen_x = ChooseX(a, b, h)
+chosen_y = FindY(chosen_x)
 
-#points = list(zip(pointsXList, pointsYList))
+# points = list(zip(pointsXList, pointsYList))
 
 
-interpolatedPolynom = InterpolatePolynomLagrange(chosenX, chosenY, n)
-#print(interpolatedPolynom)
+interpolated_polynomial = InterpolatePolynomialLagrange(chosen_x, chosen_y, n)
+x_graph = [a + i * 0.2 for i in range(int((b - a) / 0.2) + 1)]
+y_graph = [f(x) for x in x_graph]
+L_graph = [interpolated_polynomial(x) for x in x_graph]
+errors = [(f(x) - interpolated_polynomial(x)) for x in x_graph]
+max_error = max(errors)
+
+# формування графіків
+
+plt.figure(figsize=(10, 10))
+plt.plot(x_graph, y_graph, label="f(x) = sin(cos(x))", color="green")
+plt.plot(
+    x_graph, L_graph, label="Lagrange Polynomial L(x)", color="red", linestyle="--"
+)
+plt.plot(x_graph, errors, label="|f(x) - L(x)|", color="blue", linestyle=":")
+
+plt.title(f"Maximum absolute error: {max_error:.5f}")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+plt.show()
