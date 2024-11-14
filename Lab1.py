@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 points_x = input("Enter the x values  separated by space: ")
 points_x_list = [float(value) for value in points_x.split()]
-#inter_point = float(input("Enter interpolation point: "))
+# inter_point = float(input("Enter interpolation point: "))
 
 a = 1
 b = 2
@@ -29,6 +29,17 @@ def InterpolatePolynomialLagrange(x_list, y_list, n):
     return L
 
 
+def LinearInterpolation(x_list, y_list, n):
+    def g(x):
+        for i in range(n - 1):
+            if x >= x_list[i] and x <= x_list[i + 1]:
+                return y_list[i] + (x - x_list[i]) * (y_list[i + 1] - y_list[i]) / (
+                    x_list[i + 1] - x_list[i]
+                )
+
+    return g
+
+
 def ChooseX(a, b, h):
     last = a
     chosen_x = []
@@ -50,26 +61,37 @@ h = (b - a) / n
 chosen_x = ChooseX(a, b, h)
 chosen_y = FindY(chosen_x)
 
-# points = list(zip(pointsXList, pointsYList))
-
-
 interpolated_polynomial = InterpolatePolynomialLagrange(chosen_x, chosen_y, n)
-x_graph = [a + i * 0.2 for i in range(int((b - a) / 0.2) + 1)]
+linear_interpolated = LinearInterpolation(chosen_x, chosen_y, n)
+
+x_graph = [a + i * 0.05 for i in range(int((b - a) / 0.05) + 1)]
 y_graph = [f(x) for x in x_graph]
 L_graph = [interpolated_polynomial(x) for x in x_graph]
+g_graph = [linear_interpolated(x) for x in x_graph]
 errors = [(f(x) - interpolated_polynomial(x)) for x in x_graph]
 max_error = max(errors)
 
-# формування графіків
-
+# графік полінома Лагранжа
 plt.figure(figsize=(10, 10))
 plt.plot(x_graph, y_graph, label="f(x) = sin(cos(x))", color="green")
 plt.plot(
     x_graph, L_graph, label="Lagrange Polynomial L(x)", color="red", linestyle="--"
 )
 plt.plot(x_graph, errors, label="|f(x) - L(x)|", color="blue", linestyle=":")
-
 plt.title(f"Maximum absolute error: {max_error:.5f}")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# графік лінійної інтерполяції
+plt.figure(figsize=(10, 10))
+plt.plot(x_graph, y_graph, label="f(x) = sin(cos(x))", color="green")
+plt.plot(
+    x_graph, g_graph, label="Linear Interpolation g(x)", color="yellow", linestyle="--"
+)
+plt.title("Linear Interpolation")
 plt.xlabel("x")
 plt.ylabel("y")
 plt.legend()
