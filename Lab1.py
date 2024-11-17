@@ -1,5 +1,4 @@
 from math import cos, sin
-
 import matplotlib.pyplot as plt
 
 
@@ -80,7 +79,7 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-# графік лінійної інтерполяції
+# графік кусково-лінійної інтерполяції
 plt.figure(figsize=(10, 10))
 plt.plot(x_graph, y_graph, label="f(x) = sin(cos(x))", color="green")
 plt.plot(
@@ -93,7 +92,7 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-# графік похибки лінійної інтерполяції
+# графік похибки кусково-лінійної інтерполяції
 plt.figure(figsize=(10, 5))
 plt.plot(x_graph, linear_errors, label="|f(x) - g(x)|", color="orange")
 plt.title(f"Linear Interpolation Error (Max Error: {max_linear_error:.5f})")
@@ -102,3 +101,35 @@ plt.ylabel("Error")
 plt.legend()
 plt.grid(True)
 plt.show()
+
+
+# екстраполяція
+x_extrap = [a - (b - a) + i * (2 * (b - a)) / 1000 for i in range(1001)]
+y_extrap = [interpolated_polynomial(x) for x in x_extrap]
+
+plt.figure(figsize=(10, 6))
+plt.plot(x_extrap, [f(x) for x in x_extrap], label="f(x) = sin(cos(x))", color="purple")
+plt.plot(
+    x_extrap, y_extrap, label="Lagrange Polynomial L(x)", color="brown", linestyle="--"
+)
+plt.scatter(chosen_x, chosen_y, color="red", label="Nodes")
+plt.title("Extrapolation")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# графік похибки екстраполяції
+error_extrap = [abs(f(x) - interpolated_polynomial(x)) for x in x_extrap]
+plt.figure(figsize=(10, 5))
+plt.plot(x_extrap, error_extrap, label="|f(x) - L(x)|", color="blue")
+plt.title("Extrapolation error")
+plt.xlabel("x")
+plt.ylabel("Error")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+max_error_extrap = max(error_extrap)
+print(f"Maximum absolute error in extrapolation: {max_error_extrap:.5f}")
