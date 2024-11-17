@@ -2,15 +2,13 @@ from math import cos, sin
 
 import matplotlib.pyplot as plt
 
-points_x = input("Enter the x values  separated by space: ")
-points_x_list = [float(value) for value in points_x.split()]
-# inter_point = float(input("Enter interpolation point: "))
 
-a = 1
-b = 2
+n = int(input("Enter the number of points n: "))
+a = float(input("Enter the value of a: "))
+b = float(input("Enter the value of b: "))
 
 
-def f(x):  # моя функція зі завдання (2га)
+def f(x):
     return sin(cos(x))
 
 
@@ -40,36 +38,33 @@ def LinearInterpolation(x_list, y_list, n):
     return g
 
 
-def ChooseX(a, b, h):
-    last = a
-    chosen_x = []
-    while last < b:
-        chosen_x.append(last)
-        last += h
-    chosen_x.append(b)
+def ChooseX(a, b, n):
+    h = (b - a) / (n - 1)
+    chosen_x = [a + i * h for i in range(n)]
     return chosen_x
 
 
 def FindY(chosen_x):
-    chosen_y = [f(x) for x in chosen_x]
-    return chosen_y
+    return [f(x) for x in chosen_x]
 
 
-n = len(points_x_list)
-h = (b - a) / n
-
-chosen_x = ChooseX(a, b, h)
+chosen_x = ChooseX(a, b, n)
 chosen_y = FindY(chosen_x)
+
 
 interpolated_polynomial = InterpolatePolynomialLagrange(chosen_x, chosen_y, n)
 linear_interpolated = LinearInterpolation(chosen_x, chosen_y, n)
 
+# побудова графіквв
 x_graph = [a + i * 0.05 for i in range(int((b - a) / 0.05) + 1)]
 y_graph = [f(x) for x in x_graph]
 L_graph = [interpolated_polynomial(x) for x in x_graph]
 g_graph = [linear_interpolated(x) for x in x_graph]
 errors = [(f(x) - interpolated_polynomial(x)) for x in x_graph]
+linear_errors = [abs(f(x) - linear_interpolated(x)) for x in x_graph]
+
 max_error = max(errors)
+max_linear_error = max(linear_errors)
 
 # графік полінома Лагранжа
 plt.figure(figsize=(10, 10))
@@ -94,6 +89,16 @@ plt.plot(
 plt.title("Linear Interpolation")
 plt.xlabel("x")
 plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# графік похибки лінійної інтерполяції
+plt.figure(figsize=(10, 5))
+plt.plot(x_graph, linear_errors, label="|f(x) - g(x)|", color="orange")
+plt.title(f"Linear Interpolation Error (Max Error: {max_linear_error:.5f})")
+plt.xlabel("x")
+plt.ylabel("Error")
 plt.legend()
 plt.grid(True)
 plt.show()
