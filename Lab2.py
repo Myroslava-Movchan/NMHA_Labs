@@ -1,6 +1,7 @@
 import sympy as sp
 import matplotlib.pyplot as plt
 from tabulate import tabulate
+import math
 
 y0 = 1
 x0 = 0
@@ -8,16 +9,16 @@ xn = 1
 h = 0.1
 
 
-def runge_kutta_2(x0, xn, y0, h):  # метод Рунге-Кутти 2-го порядку
-    x = x0
-    y = y0
-    yD = [(x, y)]
-    while x < xn:
-        k1 = h * f(x, y)
-        k2 = h * f(x + h, y + k1)
-        y += h * (k1 + k2) / 2
-        x += h
-        yD.append((round(x, 2), round(y, 5)))
+def runge_kutta_2(x0, y0, xn, h): #метод рунге-кутти 2-го порядку
+    n = round((xn - x0) / h)  # Кількість кроків
+    y = y0 
+    yD = [(x0, y)] 
+    for i in range(1, n + 1):
+        k1 = h * f(x0, y)
+        k2 = h * f(x0 + 0.5 * h, y + 0.5 * k1)  # Використовуємо середнє значення для k2
+        y += (k1 + k2) / 2 
+        x0 += h
+        yD.append((round(x0, 2), y)) 
     return yD
 
 
@@ -37,8 +38,7 @@ def runge_kutta_4(x0, xn, y0, h):
 
 
 def f(x, y):
-    yD = 2 * x * sp.exp(x**2 - y)  # диференціальне рівняння
-    return yD
+    return 2 * x * math.exp(x**2 - y)
 
 
 rk2_result = runge_kutta_2(x0, xn, y0, h)
@@ -79,7 +79,7 @@ def analytical_solution(x_value, y0):
 table_data_2 = []
 x = x0
 while x <= xn:
-    rk2_value = [item[1] for item in rk2_result if item[0] == round(x, 2)][0]
+    rk2_value = [item[1] for item in rk2_result if item[0] == round(x, 5)][0]
     analytical_value = analytical_solution(x, y0)
     table_data_2.append([round(x, 2), round(analytical_value, 3), rk2_value])
     x += h
@@ -87,14 +87,14 @@ while x <= xn:
 headers_rk2 = [
     "x",
     "Аналітичний розв'язок",
-    "Наближений розв'язок (Рунге-Кутта 2-го порядку)",
+    "Наближений розв'язок (Рунге-Кутти 2-го порядку)",
 ]
 print(tabulate(table_data_2, headers=headers_rk2, tablefmt="grid"))
 
 table_data_4 = []
 x = x0
 while x <= xn:
-    rk4_value = [item[1] for item in rk4_result if item[0] == round(x, 2)][0]
+    rk4_value = [item[1] for item in rk4_result if item[0] == round(x, 5)][0]
     analytical_value = analytical_solution(x, y0)
     table_data_4.append([round(x, 2), round(analytical_value, 3), rk4_value])
     x += h
@@ -102,7 +102,7 @@ while x <= xn:
 headers_rk4 = [
     "x",
     "Аналітичний розв'язок",
-    "Наближений розв'язок (Рунге-Кутта 4-го порядку)",
+    "Наближений розв'язок (Рунге-Кутти 4-го порядку)",
 ]
 print(tabulate(table_data_4, headers=headers_rk4, tablefmt="grid"))
 
@@ -139,21 +139,21 @@ for h in h_values:
 headers_rk2 = [
     "h",
     "Аналітичний розв'язок",
-    "Наближений розв'язок (Рунге-Кутта 2-го порядку)",
-    "Похибка (Рунге-Кутта 2-го порядку)",
+    "Наближений розв'язок (Рунге-Кутти 2-го порядку)",
+    "Похибка (Рунге-Кутти 2-го порядку)",
 ]
 
 headers_rk4 = [
     "h",
     "Аналітичний розв'язок",
-    "Наближений розв'язок (Рунге-Кутта 4-го порядку)",
-    "Похибка (Рунге-Кутта 4-го порядку)",
+    "Наближений розв'язок (Рунге-Кутти 4-го порядку)",
+    "Похибка (Рунге-Кутти 4-го порядку)",
 ]
 
-print("Таблиця для Рунге-Кутта 2-го порядку:")
+print("Таблиця для Рунге-Кутти 2-го порядку:")
 print(tabulate(new_table_data_2, headers=headers_rk2, tablefmt="grid"))
 
-print("\nТаблиця для Рунге-Кутта 4-го порядку:")
+print("\nТаблиця для Рунге-Кутти 4-го порядку:")
 print(tabulate(new_table_data_4, headers=headers_rk4, tablefmt="grid"))
 
 
@@ -191,25 +191,25 @@ for h in h_values:
 plt.plot(
     h_values,
     actual_errors_rk2,
-    label="Фактична похибка (Рунге-Кутта 2-го порядку)",
+    label="Фактична похибка (Рунге-Кутти 2-го порядку)",
     marker="o",
 )
 plt.plot(
     h_values,
     theoretical_errors_rk2,
-    label="Теоретична похибка (Рунге-Кутта 2-го порядку)",
+    label="Теоретична похибка (Рунге-Кутти 2-го порядку)",
     marker="x",
 )
 plt.plot(
     h_values,
     actual_errors_rk4,
-    label="Фактична похибка (Рунге-Кутта 4-го порядку)",
+    label="Фактична похибка (Рунге-Кутти 4-го порядку)",
     marker="s",
 )
 plt.plot(
     h_values,
     theoretical_errors_rk4,
-    label="Теоретична похибка (Рунге-Кутта 4-го порядку)",
+    label="Теоретична похибка (Рунге-Кутти 4-го порядку)",
     marker="^",
 )
 plt.xlabel("Крок h")
