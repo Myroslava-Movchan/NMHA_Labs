@@ -1,90 +1,109 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-N = 64
-I = 10
-delta_t = I / N
-frequency = 1 / delta_t
-
-# генеруємо рівновіддалені точки в інтервалі для дискретизації
-t = np.linspace(0, I, N)
-
-# функція неперервного сигналу
 def f(t):
-    return np.where((0 <= t) & (t <= 2), (1/4) * t, 0)
+    return np.where((t >= 0) & (t <= 2), (1/4) * t, 0)
 
-# дискретизація сигналу
-x_n = np.array([f(t[n]) for n in range(N)])
+N = 64 
+T = 10 
+t_continuous = np.linspace(0, T, 1000) 
+t_discrete = np.linspace(0, T, N) 
 
-# перетворення Фур'є неперервного сигналу
-X_cont = np.fft.fft(f(t))
+# дискретизувати неперервний сигнал
+x_continuous = f(t_continuous)
+x_discrete = f(t_discrete)
+
+# перетворення Фур'є для неперервного сигналу
+X_continuous = np.fft.fft(x_continuous)
+frequencies_continuous = np.fft.fftfreq(len(x_continuous), d=(t_continuous[1] - t_continuous[0]))
 
 # амплітудний спектр неперервного сигналу
-amplitude_spectrum_cont = np.abs(X_cont)
+amplitude_spectrum_cont = np.abs(X_continuous)
 
-# зсув частоти для неперервного спектра
-frequencies_cont = np.fft.fftfreq(N, delta_t)
-frequencies_cont_shifted = np.fft.fftshift(frequencies_cont)
+# зсув частоти для амплітудного спектра неперервного сигналу
+frequencies_continuous_shifted = np.fft.fftshift(frequencies_continuous)
 amplitude_spectrum_cont_shifted = np.fft.fftshift(amplitude_spectrum_cont)
 
 # графік амплітудного спектра неперервного сигналу
 plt.figure(figsize=(12, 6))
-plt.plot(frequencies_cont_shifted, amplitude_spectrum_cont_shifted)
+plt.plot(frequencies_continuous_shifted, amplitude_spectrum_cont_shifted)
 plt.title('Амплітудний спектр неперервного сигналу')
 plt.xlabel('Частота [Гц]')
 plt.ylabel('Амплітуда')
-plt.show()
-
-# амплітудний спектр дискретного сигналу (без використання перетворення Фур'є з бібліотеки)
-X_dft = np.zeros(N, dtype=complex)
-frequencies_dft = np.zeros(N)
-for k in range(N):
-    X_dft[k] = sum(x_n[n] * np.exp(-2j * np.pi * k * n / N) for n in range(N))
-    frequencies_dft[k] = k / (N * delta_t)
-
-amplitude_spectrum_dft = np.abs(X_dft)
-
-# зсув частоти для дискретного спектра без перетворення фур'є з бібліотеки
-# переміщуємо нульову частоту в центр
-frequencies_dft_shifted = np.fft.fftshift(frequencies_dft)
-amplitude_spectrum_dft_shifted = np.fft.fftshift(amplitude_spectrum_dft)
-
-# графік амплітудного спектра дискретного сигналу (без використання перетворення Фур'є з бібліотеки)
-plt.figure(figsize=(12, 6))
-plt.plot(frequencies_dft_shifted, amplitude_spectrum_dft_shifted)
-plt.title('Амплітудний спектр дискретного сигналу (без використання перетворення Фур`є з бібліотеки)')
-plt.xlabel('Частота [Гц]')
-plt.ylabel('Амплітуда')
-plt.show()
-
-# амплітудний спектр дискретного сигналу (numpy)
-X_k = np.fft.fft(x_n)
-amplitude_spectrum_np = np.abs(X_k)
-
-# зсув частоти для дискретного спектра (numpy)
-frequencies_np = np.fft.fftfreq(N, delta_t)
-frequencies_np_shifted = np.fft.fftshift(frequencies_np)
-amplitude_spectrum_np_shifted = np.fft.fftshift(amplitude_spectrum_np)
-
-# графік амплітудного спектра дискретного сигналу (numpy)
-plt.figure(figsize=(12, 6))
-plt.plot(frequencies_np_shifted, amplitude_spectrum_np_shifted)
-plt.title('Амплітудний спектр дискретного сигналу (з numpy)')
-plt.xlabel('Частота [Гц]')
-plt.ylabel('Амплітуда')
-plt.show()
-
-# обернене перетворення Фур'є частотного спектру 
-x_prime = np.fft.ifft(X_k)
-
-# графік порівняння оригінального та відновленого сигналу
-plt.figure(figsize=(12, 6))
-plt.stem(t, x_n, label='Оригінальний сигнал', linefmt='b-', markerfmt='bo', basefmt='b')
-plt.plot(t, np.real(x_prime), label='Відновлений сигнал', color='r', linestyle='--')
-plt.title('Порівняння оригінального та відновленого сигналу')
-plt.xlabel('Час [с]')
-plt.ylabel('Амплітуда')
-plt.legend()
 plt.grid(True)
 plt.show()
 
+# графіки неперервного та дискретизованого сигналів
+plt.figure(figsize=(12, 6))
+plt.subplot(2, 1, 1)
+plt.plot(t_continuous, x_continuous, label='Неперервний сигнал', color='blue')
+plt.title('Неперервний сигнал')
+plt.xlabel('Час (с)')
+plt.ylabel('Амплітуда')
+plt.grid()
+plt.legend()
+
+plt.subplot(2, 1, 2)
+plt.stem(t_discrete, x_discrete, label='Дискретизований сигнал', basefmt=" ", linefmt='orange')
+plt.title('Дискретизований сигнал')
+plt.xlabel('Час (с)')
+plt.ylabel('Амплітуда')
+plt.grid()
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+
+# ручне ДПФ
+def manual_dft(x):
+    N = len(x)
+    X = np.zeros(N, dtype=complex)
+    for k in range(N):
+        for n in range(N):
+            X[k] += x[n] * np.exp(-2j * np.pi * k * n / N)
+    return X
+
+# амплітуда для ручного ДПФ
+X_discrete_manual = manual_dft(x_discrete)
+frequencies_discrete_manual = np.fft.fftfreq(N, d=(t_discrete[1] - t_discrete[0]))
+
+# ДПФ бібліотека
+X_discrete_numpy = np.fft.fft(x_discrete)
+frequencies_discrete_numpy = np.fft.fftfreq(N, d=(t_discrete[1] - t_discrete[0]))
+
+# амплітуда ДПФ  біліотека
+plt.figure(figsize=(12, 6))
+plt.subplot(2, 1, 1)
+plt.plot(frequencies_discrete_manual, np.abs(X_discrete_manual), label='Амплітуда ручний обрахунок', color='blue')
+plt.title('Амплітуда')
+plt.xlabel('Частота')
+plt.ylabel('y')
+plt.xlim(0, 5) 
+plt.grid()
+plt.legend()
+
+plt.subplot(2, 1, 2)
+plt.plot(frequencies_discrete_numpy, np.abs(X_discrete_numpy), label='Амплітуда з використанням бібліотеки', color='orange')
+plt.title('Амплітуда')
+plt.xlabel('Частота')
+plt.ylabel('y')
+plt.xlim(0, 5) 
+plt.grid()
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+
+# обернене ПФ
+x_reconstructed = np.fft.ifft(X_discrete_numpy)
+
+# порівняння сигналів (обернене і дискретне)
+plt.figure(figsize=(12, 6))
+plt.plot(t_discrete, x_discrete, label='Дискретне перетворення', color='orange')
+plt.plot(t_discrete, np.real(x_reconstructed), label='Обернене перетворення', color='green', linestyle='--')
+plt.title('Порівняння')
+plt.xlabel('Час (с)')
+plt.ylabel('Амплітуда')
+plt.grid()
+plt.legend()
+plt.show()
